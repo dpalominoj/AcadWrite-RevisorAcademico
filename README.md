@@ -54,24 +54,24 @@ cd AcadWrite-RevisorAcademico
 Instala las dependencias en el backend y frontend:
 ```bash
 # Backend
-cd src/backend && npm install
+cd backend && npm install
 
 # Frontend
-cd src/frontend && npm install
+cd frontend && npm install
 ```
 
 ## Ejecución del Proyecto
 Ejecutar backend:
 
 ```bash
-cd src/backend
+cd backend
 npm run dev
 ```
 
 Ejecutar frontend:
 
 ```bash
-cd src/frontend
+cd frontend
 npm start
 ```
 
@@ -80,21 +80,20 @@ npm start
 ```bash
 acadwrite/
 ├── documentos/
-├── src/
-│   ├── frontend/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   └── public/
-│   ├── backend/
-│   │   ├── controllers/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── middleware/
-│   │   └── services/
-│   ├── n8n-automation/
-│   └── ai-components/
+├── frontend/
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   ├── utils/
+│   └── public/
+├── backend/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── middleware/
+│   └── services/
+├── n8n-automation/
+└── ai-components/
 ├── config/
 ├── tests/
 ├── .github/
