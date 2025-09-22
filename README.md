@@ -96,9 +96,7 @@ acadwrite/
 └── ai-components/
 ├── config/
 ├── tests/
-├── .github/
-├── docker-compose.yml
-└── package.json
+└── .github/
 ```
 
 ## Scripts Disponibles
@@ -121,21 +119,19 @@ npm run test
 ```
 
 ## Autores
-[Autor 1]
-[Autor 2]
-[Autor 3]
-[Autor 4]
-[Autor 5]
-[Autor 6]
-[Autor 7]
+- <a href="mailto:dany.palomino@ejemplo.com">👤</a> Nombre de Integrante 1 - Desarrollador Líder
+- <a href="mailto:dany.palomino@ejemplo.com">👤</a> Nombre de Integrante 2 - Especialista en IA
+- <a href="mailto:dany.palomino@ejemplo.com">👤</a> Nombre de Integrante 3 - Diseñador UI/UX
+- <a href="mailto:dany.palomino@ejemplo.com">👤</a> Nombre de Integrante 4 - Desarrollador Backend
+- <a href="mailto:dany.palomino@ejemplo.com">👤</a> Nombre de Integrante 5 - Desarrollador Frontend
+- <a href="mailto:dany.palomino@ejemplo.com">👤</a> Nombre de Integrante 6 - Analista de Datos
 
 ## Licencia
-
 Este proyecto está bajo la licencia MIT. Consulta el archivo LICENSE para más información.
 
 ---
 
-### Contribución
+## Contribución
 ¡Tu apoyo es bienvenido! Si quieres contribuir
 
 1. Haz un fork del proyecto.
