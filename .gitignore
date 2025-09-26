@@ -1,0 +1,177 @@
+# Variables de entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging.local
+
+# Configuraciones específicas de entornos
+config/*.local.js
+config/*.local.json
+
+# Dependencias de Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Dependencias de frontend y backend
+src/frontend/node_modules/
+src/backend/node_modules/
+
+# Cache de package managers
+.npm/
+.yarn/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Build de React
+src/frontend/build/
+src/frontend/dist/
+
+# Build de producción
+dist/
+build/
+
+# Output de Next.js
+.next/
+out/
+
+# Output de Nuxt.js
+.nuxt/
+
+# Cache de Parcel
+.cache/
+.parcel-cache/
+
+# Logs de aplicaciones
+logs/
+*.log
+lerna-debug.log*
+
+# Datos de runtime
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Archivos temporales
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Cobertura de tests
+coverage/
+.nyc_output/
+*.lcov
+
+# Reportes de diagnóstico de Node.js
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Datos de MongoDB local
+data/
+mongodb_data/
+
+# Backup de base de datos
+*.dump
+*.backup
+
+# Archivos de DynamoDB local
+.dynamodb/
+
+# Volúmenes de Docker (excepto docker-compose.yml)
+docker-volumes/
+
+# Logs de contenedores
+**/docker.log
+
+# Archivos de sistema
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Archivos de Windows
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Archivos de instalación de Windows
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Configuración de VS Code (mantener settings básicos)
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Historial local de VS Code
+.history/
+
+# Configuración de IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Cache de ESLint
+.eslintcache
+
+# Cache de Stylelint
+.stylelintcache
+
+# Cache de Microbundle
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Directorios de instrumentación
+lib-cov/
+
+# Archivos de empaquetado npm
+*.tgz
+
+# Integridad de Yarn
+.yarn-integrity
+
+# Archivos de conexión peer
+libpeerconnection.log
+
+# Archivos de testem
+testem.log
+
+# Mantener documentación importante
+!documentos/
+!README.md
+!LICENSE
+
+# Mantener estructura de directorios necesaria
+!src/
+!config/
+!tests/
+!.github/
+
+# Mantener archivos de configuración esenciales
+!package.json
+!docker-compose.yml
+!docker-compose.prod.yml
+!.gitignore
+
+# Mantener ejemplos de configuración
+!*.example
+!*.sample
