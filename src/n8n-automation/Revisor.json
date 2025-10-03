@@ -1,0 +1,319 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "eres una experto de correccion de gramatica y ortografía, corrige todo el texto que recibas, pero no añadas palabras propias de las funciones que realizas o realizaste"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        -352
+      ],
+      "id": "6afe8f0a-1fa0-4423-960c-e9b911784c15",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {
+          "temperature": 0.1,
+          "topK": 20,
+          "topP": 0.8,
+          "frequencyPenalty": 0.2,
+          "presencePenalty": 0.2,
+          "repeatPenalty": 1.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -176
+      ],
+      "id": "0ebdea09-a25a-4786-8829-ebeaed0d59be",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "dgoz0ydVkqNgFcdV",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -384
+      ],
+      "id": "95d0f430-3aad-4505-bbf4-61f352ffdd49",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64f6b1b7-3c8e-4660-8438-f594a3355c30",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "33731b05-08f7-4f6a-a7d8-7d64da924929",
+              "name": "new_url",
+              "value": "={{ $('HTTP Request2').item.json.body.url.split('/').pop() }}-C",
+              "type": "string"
+            },
+            {
+              "id": "abf8b39d-50b1-433d-85d1-5cc0fa7da580",
+              "name": "bucket",
+              "value": "={{ $('Webhook').item.json.body.userId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -368
+      ],
+      "id": "f8eda8c6-2e97-40c8-8a6d-edb7c5c1948c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce2958e7-9a9e-4159-8a8b-5528a2e5a766",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -416,
+        -384
+      ],
+      "id": "27cb09f8-9d08-4a63-bfa2-c41e5470bb2a",
+      "name": "Webhook",
+      "webhookId": "ce2958e7-9a9e-4159-8a8b-5528a2e5a766"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        -384
+      ],
+      "id": "cf1cdfc0-15fa-464a-9834-f7f22a3a9a5d",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.output;\n\nconst htmlText = text.replace(/\\n/g, \"<br>\");\n\nconst html = `\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body {\n      font-family: Arial, Helvetica, sans-serif;\n      font-size: 12pt;\n      margin: 96px;          /* Márgenes estilo Word */\n      line-height: 1.5;      /* Espaciado entre líneas */\n    }\n    h1 {\n      text-align: center;\n      margin-bottom: 20px;\n    }\n    p {\n      white-space: pre-wrap;\n      margin: 5px 0;\n    }\n    table {\n      border-collapse: collapse;\n      width: 100%;\n      margin-top: 20px;\n    }\n    th, td {\n      border: 1px solid #333;\n      padding: 8px;\n      text-align: left;\n    }\n    th {\n      background-color: #f2f2f2;\n    }\n  </style>\n</head>\n<body>\n  <p>${htmlText}</p>\n</body>\n</html>\n`;\n\nreturn [{ json: { html } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        -352
+      ],
+      "id": "9cf2276e-e109-4e12-9c2d-f14b43dde84d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "htmlInput": "={{ $json.html }}"
+      },
+      "type": "CUSTOM.html2Pdf",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        -352
+      ],
+      "id": "a07f85f1-e79d-4d61-9227-7a74f7e9b0bf",
+      "name": "HTML to PDF1",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "credentials": {
+        "customJsApi": {
+          "id": "sxQiMEbhHYBiXOE0",
+          "name": "CustomJS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://aenoowtysbcvjggchfrr.supabase.co/storage/v1/object/Acceso/{{ $('Edit Fields').item.json.bucket }}/{{ $binary.data.fileName }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbm9vd3R5c2JjdmpnZ2NoZnJyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1Njg1MzE1OSwiZXhwIjoyMDcyNDI5MTU5fQ.ZZIBmF1u_13WqW3Nw9JkuJa_nURNsxvwKqgi4WC46G0"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbm9vd3R5c2JjdmpnZ2NoZnJyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1Njg1MzE1OSwiZXhwIjoyMDcyNDI5MTU5fQ.ZZIBmF1u_13WqW3Nw9JkuJa_nURNsxvwKqgi4WC46G0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        -352
+      ],
+      "id": "3f8e6e0e-fc81-42fe-b673-ea91c03e6378",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  if (item.binary && item.binary.data) {\n    // Usamos la variable new_url de tu otro nodo\n    item.binary.data.fileName = $('Edit Fields').first().json.new_url + \".pdf\";\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        -352
+      ],
+      "id": "69f60a11-f2e8-456f-b543-ab330c32a781",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTML to PDF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML to PDF1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2f33a5d7-1f7f-4e8d-a280-4e1b43aa41f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c130326601653bc9d94ba418a1ff6022df483a9dd7764fca78109007807cac48"
+  },
+  "id": "3WZ4YVP3XDMA8tUO",
+  "tags": []
+}
