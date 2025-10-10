@@ -10,7 +10,7 @@ import path from "path";
 import userRouter from "./admin-api/routes/user.route.js";
 import authRouter from "./admin-api/routes/auth.route.js";
 import testRouter from "./admin-api/routes/test.route.js";
-//import documentRouter from "./admin-api/routes/document.route.js";
+import documentRouter from "./admin-api/routes/document.route.js";
 import feedbackRouter from "./admin-api/routes/feedback.route.js";
 
 // Seed
@@ -45,7 +45,7 @@ app.use(cors(corsOptions));
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/test", testRouter);
-//app.use("/api/document", documentRouter);
+app.use("/api/document", documentRouter);
 app.use("/api/feedback", feedbackRouter);
 
 // Error handler

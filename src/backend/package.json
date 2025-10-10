@@ -14,6 +14,7 @@
     "dev": "nodemon api/server.js",
     "start": "node api/server.js",
     "test": "cd test && cross-env NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.mjs --coverage",
+    "test:integracion": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config ./test/jest.integracion.config.mjs --runInBand",
     "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.mjs --watchAll"
   },
   "keywords": [],
