@@ -1,0 +1,11 @@
+authtoken: < ===TOKEN=== >
+version: "2"
+tunnels:
+  n8n:
+    proto: http
+    addr: 5678
+    inspect: true
+  ollama:
+    proto: http
+    addr: 11434
+    inspect: true

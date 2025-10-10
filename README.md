@@ -1,5 +1,5 @@
-# Proyecto MERN
-> AcadWrite - Revisor Automático de Escritura Académica
+# `Proyecto MERN`
+`> AcadWrite` - Revisor Automático de Escritura Académica
 
 ## Tabla de contenido
 1. [Descripción del Proyecto](#descripción)
@@ -54,24 +54,24 @@ cd AcadWrite-RevisorAcademico
 Instala las dependencias en el backend y frontend:
 ```bash
 # Backend
-cd backend && npm install
+cd src/backend && npm install
 
 # Frontend
-cd frontend && npm install
+cd src/frontend && npm install
 ```
 
 ## Ejecución del Proyecto
 Ejecutar backend:
 
 ```bash
-cd backend
+cd src/backend
 npm run dev
 ```
 
 Ejecutar frontend:
 
 ```bash
-cd frontend
+cd src/frontend
 npm start
 ```
 
@@ -112,10 +112,20 @@ acadwrite/
 - `npm test`: Ejecuta pruebas.
 
 ## Pruebas
-Para correr pruebas en backend o frontend:
-
+Para ejecutar las pruebas, ubíquese en el directorio (src/frontend o src/backend) e instale las dependencias con npm install:
+- ### Pruebas Unitarias
 ```bash
+# Desde src/frontend
 npm run test
+
+# Desde src/backend
+npm run test
+```
+
+- ### Pruebas de integración
+```bash
+# Desde src/backend
+npm run test:integracion
 ```
 
 ## Autores

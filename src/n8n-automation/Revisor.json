@@ -1,0 +1,606 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "Eres un experto corrector de textos académicos y profesionales. \nCorrige el texto que recibas mejorando su gramática, ortografía, coherencia, claridad y estilo. \nNo cambies el significado del texto ni agregues información nueva. \nNo incluyas explicaciones, comentarios, ni palabras relacionadas con las funciones que realizas. \nDevuelve únicamente el texto corregido."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        -240
+      ],
+      "id": "6afe8f0a-1fa0-4423-960c-e9b911784c15",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {
+          "temperature": 0.1,
+          "topK": 20,
+          "topP": 0.8,
+          "frequencyPenalty": 0.2,
+          "presencePenalty": 0.2,
+          "repeatPenalty": 1.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -48
+      ],
+      "id": "0ebdea09-a25a-4786-8829-ebeaed0d59be",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "dgoz0ydVkqNgFcdV",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        96,
+        -272
+      ],
+      "id": "95d0f430-3aad-4505-bbf4-61f352ffdd49",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64f6b1b7-3c8e-4660-8438-f594a3355c30",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "33731b05-08f7-4f6a-a7d8-7d64da924929",
+              "name": "new_url",
+              "value": "={{ $('HTTP Request2').item.json.body.documento.url.split('/').pop() }}-C",
+              "type": "string"
+            },
+            {
+              "id": "abf8b39d-50b1-433d-85d1-5cc0fa7da580",
+              "name": "bucket",
+              "value": "={{ $('Webhook').item.json.body.estudiante.userId }}",
+              "type": "string"
+            },
+            {
+              "id": "61788df0-10a2-49a6-8758-97b2ab430c0c",
+              "name": "email_student",
+              "value": "={{ $('Webhook').item.json.body.estudiante.email }}",
+              "type": "string"
+            },
+            {
+              "id": "231f69c8-d8d1-4f9a-8c0c-464337ab32f0",
+              "name": "email_teachers",
+              "value": "={{ $('Webhook').item.json.body.correosDocentes[1] }}",
+              "type": "string"
+            },
+            {
+              "id": "a9b2e865-0b28-42d0-b0ff-b4f0d946cbd6",
+              "name": "doc_name",
+              "value": "={{ $('Webhook').item.json.body.documento.fileName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        -272
+      ],
+      "id": "f8eda8c6-2e97-40c8-8a6d-edb7c5c1948c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce2958e7-9a9e-4159-8a8b-5528a2e5a766",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -288,
+        -224
+      ],
+      "id": "27cb09f8-9d08-4a63-bfa2-c41e5470bb2a",
+      "name": "Webhook",
+      "webhookId": "ce2958e7-9a9e-4159-8a8b-5528a2e5a766"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.documento.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        -320
+      ],
+      "id": "cf1cdfc0-15fa-464a-9834-f7f22a3a9a5d",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.output;\n\nconst htmlText = text.replace(/\\n/g, \"<br>\");\n\nconst html = `\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body {\n      font-family: Arial, Helvetica, sans-serif;\n      font-size: 12pt;\n      margin: 96px;          /* Márgenes estilo Word */\n      line-height: 1.5;      /* Espaciado entre líneas */\n    }\n    h1 {\n      text-align: center;\n      margin-bottom: 20px;\n    }\n    p {\n      white-space: pre-wrap;\n      margin: 5px 0;\n    }\n    table {\n      border-collapse: collapse;\n      width: 100%;\n      margin-top: 20px;\n    }\n    th, td {\n      border: 1px solid #333;\n      padding: 8px;\n      text-align: left;\n    }\n    th {\n      background-color: #f2f2f2;\n    }\n  </style>\n</head>\n<body>\n  <p>${htmlText}</p>\n</body>\n</html>\n`;\n\nreturn [{ json: { html } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -192
+      ],
+      "id": "9cf2276e-e109-4e12-9c2d-f14b43dde84d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "htmlInput": "={{ $json.html }}"
+      },
+      "type": "CUSTOM.html2Pdf",
+      "typeVersion": 1,
+      "position": [
+        992,
+        -240
+      ],
+      "id": "a07f85f1-e79d-4d61-9227-7a74f7e9b0bf",
+      "name": "HTML to PDF1",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "credentials": {
+        "customJsApi": {
+          "id": "sxQiMEbhHYBiXOE0",
+          "name": "CustomJS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://aenoowtysbcvjggchfrr.supabase.co/storage/v1/object/Acceso/{{ $('Edit Fields').item.json.bucket }}/{{ $binary.data.fileName }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbm9vd3R5c2JjdmpnZ2NoZnJyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1Njg1MzE1OSwiZXhwIjoyMDcyNDI5MTU5fQ.ZZIBmF1u_13WqW3Nw9JkuJa_nURNsxvwKqgi4WC46G0"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbm9vd3R5c2JjdmpnZ2NoZnJyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1Njg1MzE1OSwiZXhwIjoyMDcyNDI5MTU5fQ.ZZIBmF1u_13WqW3Nw9JkuJa_nURNsxvwKqgi4WC46G0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        -240
+      ],
+      "id": "3f8e6e0e-fc81-42fe-b673-ea91c03e6378",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  if (item.binary && item.binary.data) {\n    // Usamos la variable new_url de tu otro nodo\n    item.binary.data.fileName = $('Edit Fields').first().json.new_url + \".pdf\";\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        -272
+      ],
+      "id": "69f60a11-f2e8-456f-b543-ab330c32a781",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').item.json.email_student }}",
+        "subject": "Correo de confirmacion de Trabajo corregido",
+        "message": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Tabla de Archivos</title>\n    <style>\n        table {\n            border-collapse: collapse;\n            width: 50%;\n            margin: 20px auto;\n            text-align: left;\n        }\n        th, td {\n            border: 1px solid #333;\n            padding: 10px;\n        }\n        th {\n            background-color: #f2f2f2;\n        }\n    </style>\n</head>\n<body>\n    <table>\n        <tr>\n            <th>Nombre del archivo</th>\n            <th>Tarea</th>\n            <th>Archivo corregio</th>\n        </tr>\n        <tr>\n            <td>{{ $('Edit Fields').item.json.doc_name }}</td>\n            <td>Corrección</td>\n            <td>\n                <a href=\"https://aenoowtysbcvjggchfrr.supabase.co/storage/v1/object/{{ $json.Key }}\" target=\"_blank\">\n                    Archivo\n                </a>\n            </td>\n        </tr>\n    </table>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1600,
+        -144
+      ],
+      "id": "331f7855-f4fa-4480-aff9-16183211ebad",
+      "name": "Send a message (Student)",
+      "webhookId": "525318c3-7f29-47e9-a76c-9beb7e3519b8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PdCXgwmz03dmpmsM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').item.json.email_teachers }}",
+        "subject": "Correo de confirmacion de Trabajo corregido de : ",
+        "message": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Tabla de Archivos</title>\n    <style>\n        table {\n            border-collapse: collapse;\n            width: 50%;\n            margin: 20px auto;\n            text-align: left;\n        }\n        th, td {\n            border: 1px solid #333;\n            padding: 10px;\n        }\n        th {\n            background-color: #f2f2f2;\n        }\n    </style>\n</head>\n<body>\n    <table>\n        <tr>\n            <th>Archivo Subido</th>\n            <th>Tipo de Revisión</th>\n            <th>Archivo Correrigo</th>\n        </tr>\n        <tr>\n            <td>{{ $('Edit Fields').item.json.doc_name }}</td>\n            <td>Corrección</td>\n            <td>\n                <a href=\"https://aenoowtysbcvjggchfrr.supabase.co/storage/v1/object/{{ $json.Key }}\" target=\"_blank\">\n                    Archivo\n                </a>\n            </td>\n        </tr>\n    </table>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1584,
+        -368
+      ],
+      "id": "4a6df418-d3e3-4322-9f3a-17753e05138f",
+      "name": "Send a message (Teacher)",
+      "webhookId": "525318c3-7f29-47e9-a76c-9beb7e3519b8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PdCXgwmz03dmpmsM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mistral-nemo:latest",
+        "options": {
+          "format": "json"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        848,
+        -528
+      ],
+      "id": "5030b6ad-c957-491a-9739-c617916951cb",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "dgoz0ydVkqNgFcdV",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "=Evalúa la calidad del siguiente texto corregido respecto al original:\n\nTexto original: {{ $('Edit Fields').item.json.text }}\nTexto corregido: {{ $json.output }}\n\nDevuelve ÚNICAMENTE un JSON válido en el formato siguiente:\n{\n  \"gramatica\": <número del 1 al 5>,\n  \"claridad\": <número del 1 al 5>,\n  \"fidelidad\": <número del 1 al 5>,\n  \"estilo\": <número del 1 al 5>,\n  \"comentario\": \"breve comentario general\"\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        848,
+        -688
+      ],
+      "id": "e5269f2c-5d4e-496f-b73f-632a0ce9e35d",
+      "name": "QA - Agent"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1184,
+        -688
+      ],
+      "id": "80da2e16-df3f-4de0-a249-0ea69b37edfa",
+      "name": "to-json"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1BjunVHNW61Phhrc_zQpfBhPGKV5Vou_z0gct__RV-tY",
+          "mode": "list",
+          "cachedResultName": "Resultados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BjunVHNW61Phhrc_zQpfBhPGKV5Vou_z0gct__RV-tY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BjunVHNW61Phhrc_zQpfBhPGKV5Vou_z0gct__RV-tY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "gramatica": "={{ $json.gramatica }}",
+            "claridad": "={{ $json.claridad }}",
+            "fidelidad": "={{ $json.fidelidad }}",
+            "estilo": "={{ $json.estilo }}",
+            "comentario": "={{ $json.comentario }}",
+            "fecha": "==AHORA()"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "gramatica",
+              "displayName": "gramatica",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "claridad",
+              "displayName": "claridad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fidelidad",
+              "displayName": "fidelidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estilo",
+              "displayName": "estilo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "comentario",
+              "displayName": "comentario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1408,
+        -688
+      ],
+      "id": "8f972005-1e95-4aa8-9fe5-e0f5f7ba9975",
+      "name": "Save_Score-IA",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "K6lbQsmOiw6rCpwd",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "QA - Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTML to PDF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML to PDF1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Send a message (Teacher)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message (Student)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message (Teacher)": {
+      "main": [
+        []
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "QA - Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QA - Agent": {
+      "main": [
+        [
+          {
+            "node": "to-json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "to-json": {
+      "main": [
+        [
+          {
+            "node": "Save_Score-IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "749bbad5-e898-4cc3-81cb-0935dac68f9a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c130326601653bc9d94ba418a1ff6022df483a9dd7764fca78109007807cac48"
+  },
+  "id": "3WZ4YVP3XDMA8tUO",
+  "tags": []
+}
